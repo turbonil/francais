@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drill — Présent de l'indicatif (282 conjugaisons)</title>
+<style>
+  :root {
+    --bg-page: #FAF9F5;
+    --bg-card: #FFFFFF;
+    --bg-secondary: #F1EFE8;
+    --text-primary: #1A1A1A;
+    --text-secondary: #5F5E5A;
+    --text-tertiary: #888780;
+    --border-tertiary: rgba(0,0,0,0.10);
+    --border-secondary: rgba(0,0,0,0.20);
+    --accent: #7F77DD;
+    --accent-bg: #EEEDFE;
+    --ok: #1D9E75;
+    --ok-bg: rgba(29,158,117,0.10);
+    --ko: #E24B4A;
+    --ko-bg: rgba(226,75,74,0.10);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-page: #1A1A1A;
+      --bg-card: #2A2A2A;
+      --bg-secondary: #333333;
+      --text-primary: #F1EFE8;
+      --text-secondary: #B4B2A9;
+      --text-tertiary: #888780;
+      --border-tertiary: rgba(255,255,255,0.12);
+      --border-secondary: rgba(255,255,255,0.22);
+      --accent: #AFA9EC;
+      --accent-bg: #3C3489;
+      --ok: #5DCAA5;
+      --ok-bg: rgba(93,202,165,0.15);
+      --ko: #F09595;
+      --ko-bg: rgba(240,149,149,0.15);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 2rem 1rem;
+    background: var(--bg-page);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+  .container { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 22px; font-weight: 500; margin: 0 0 0.25rem; }
+  .subtitle { font-size: 14px; color: var(--text-secondary); margin: 0 0 1.5rem; }
+
+  .drill-bar {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 1rem; flex-wrap: wrap; font-size: 13px;
+  }
+  .meta { color: var(--text-secondary); }
+  .meta b { color: var(--text-primary); font-weight: 500; }
+  .ok-text { color: var(--ok); font-weight: 500; }
+  .ko-text { color: var(--ko); font-weight: 500; }
+  .progress-bar {
+    flex: 1; min-width: 120px; height: 6px;
+    background: var(--bg-secondary); border-radius: 3px; overflow: hidden;
+  }
+  .progress-bar > div {
+    height: 100%; background: var(--accent); transition: width 0.25s;
+  }
+
+  button {
+    font-family: inherit; font-size: 14px;
+    padding: 8px 14px; border-radius: var(--radius-md);
+    border: 0.5px solid var(--border-secondary);
+    background: transparent; color: var(--text-primary);
+    cursor: pointer; transition: background 0.15s, transform 0.05s;
+  }
+  button:hover { background: var(--bg-secondary); }
+  button:active { transform: scale(0.98); }
+  button.small { font-size: 12px; padding: 4px 10px; }
+
+  .card {
+    background: var(--bg-card);
+    border: 0.5px solid var(--border-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem 1.5rem;
+    text-align: center;
+  }
+  .tag {
+    display: inline-block; font-size: 12px; color: var(--text-secondary);
+    background: var(--bg-secondary); padding: 4px 10px;
+    border-radius: 999px; margin-bottom: 1.25rem;
+  }
+  .tag.hidden { visibility: hidden; }
+  .prompt {
+    display: flex; align-items: center; justify-content: center;
+    gap: 16px; margin-bottom: 1.25rem; flex-wrap: wrap;
+  }
+  .verb { font-size: 24px; font-weight: 500; }
+  .arrow { color: var(--text-tertiary); font-size: 20px; }
+  .pronoun {
+    font-size: 22px; font-weight: 500;
+    color: var(--accent); background: var(--accent-bg);
+    padding: 6px 14px; border-radius: var(--radius-md);
+  }
+
+  input.answer {
+    width: 100%; max-width: 380px;
+    font-family: inherit; font-size: 17px;
+    text-align: center;
+    padding: 10px 12px;
+    border: 0.5px solid var(--border-secondary);
+    border-radius: var(--radius-md);
+    background: var(--bg-card); color: var(--text-primary);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  input.answer:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-bg); }
+  input.answer.ok { border-color: var(--ok); color: var(--ok); box-shadow: 0 0 0 2px var(--ok-bg); }
+  input.answer.ko { border-color: var(--ko); color: var(--ko); box-shadow: 0 0 0 2px var(--ko-bg); }
+  input.answer:disabled { opacity: 1; }
+
+  .actions { display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+
+  .feedback {
+    margin-top: 1rem; min-height: 28px; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; flex-wrap: wrap;
+  }
+  .feedback.ok { color: var(--ok); }
+  .feedback.ko { color: var(--ko); }
+  .feedback .answer-text { color: var(--text-primary); font-weight: 500; }
+
+  .speak-btn {
+    background: none; border: 0.5px solid var(--border-tertiary);
+    border-radius: 50%; width: 26px; height: 26px;
+    cursor: pointer; font-size: 13px; color: var(--text-secondary);
+    display: inline-flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: background 0.15s;
+  }
+  .speak-btn:hover { background: var(--bg-secondary); }
+  .speak-btn.speaking { color: var(--accent); border-color: var(--accent); }
+
+  .end { text-align: center; padding: 2rem 1rem; }
+  .end h3 { font-size: 18px; font-weight: 500; margin: 0 0 0.5rem; }
+  .end p { font-size: 15px; color: var(--text-secondary); margin: 0.25rem 0; }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 1.25rem 0; }
+  .stat {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+  }
+  .stat .label { font-size: 13px; color: var(--text-secondary); }
+  .stat .value { font-size: 24px; font-weight: 500; margin-top: 4px; }
+  .stat .value.ok { color: var(--ok); }
+  .stat .value.ko { color: var(--ko); }
+
+  .errors-list {
+    text-align: left; max-height: 240px; overflow-y: auto;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem; font-size: 13px;
+    margin-top: 1rem;
+  }
+  .errors-list .row {
+    padding: 6px 0;
+    border-bottom: 0.5px solid var(--border-tertiary);
+    display: flex; justify-content: space-between; gap: 12px;
+  }
+  .errors-list .row:last-child { border-bottom: none; }
+  .errors-list .wrong { color: var(--ko); text-decoration: line-through; }
+  .errors-list .right { color: var(--ok); font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Drill — Présent de l'indicatif</h1>
+  <p class="subtitle">282 conjugaisons (47 verbes × 6 personnes), ordre aléatoire.</p>
+
+  <div class="drill-bar">
+    <span class="meta">Progrès : <b id="prog-text">1 / 282</b></span>
+    <div class="progress-bar"><div id="prog-bar" style="width: 0%"></div></div>
+    <span class="ok-text" id="score-ok">✓ 0</span>
+    <span class="ko-text" id="score-ko">✗ 0</span>
+    <button id="toggle-tip" type="button" class="small">Cacher l'indice</button>
+    <button id="restart" type="button" class="small">Recommencer</button>
+  </div>
+
+  <div id="card-area" class="card">
+    <div class="tag" id="cat-tag">—</div>
+    <div class="prompt">
+      <span class="verb" id="verb">—</span>
+      <span class="arrow">→</span>
+      <span class="pronoun" id="pron">—</span>
+    </div>
+    <input id="answer" class="answer" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Tape la conjugaison complète…" />
+    <div class="actions">
+      <button id="check" type="button">Vérifier</button>
+      <button id="reveal" type="button">Voir la réponse</button>
+      <button id="next" type="button" style="display: none;">Suivant ↵</button>
+    </div>
+    <div id="feedback" class="feedback"></div>
+  </div>
+
+  <div id="end-area" style="display: none;"></div>
+</div>
+
+<script>
+(function(){
+  const VERBS = [
+    {v:"être", c:"irrégulier", f:["je suis","tu es","il est","nous sommes","vous êtes","ils sont"]},
+    {v:"avoir", c:"irrégulier", f:["j'ai","tu as","il a","nous avons","vous avez","ils ont"]},
+    {v:"aller", c:"irrégulier", f:["je vais","tu vas","il va","nous allons","vous allez","ils vont"]},
+    {v:"faire", c:"irrégulier", f:["je fais","tu fais","il fait","nous faisons","vous faites","ils font"]},
+    {v:"dire", c:"irrégulier", f:["je dis","tu dis","il dit","nous disons","vous dites","ils disent"]},
+    {v:"pouvoir", c:"irrégulier (3 rad.)", f:["je peux","tu peux","il peut","nous pouvons","vous pouvez","ils peuvent"]},
+    {v:"vouloir", c:"irrégulier (3 rad.)", f:["je veux","tu veux","il veut","nous voulons","vous voulez","ils veulent"]},
+    {v:"courir", c:"1 rad. (≠-er)", f:["je cours","tu cours","il court","nous courons","vous courez","ils courent"]},
+    {v:"rire", c:"1 rad. (≠-er)", f:["je ris","tu ris","il rit","nous rions","vous riez","ils rient"]},
+    {v:"travailler", c:"1 rad. (-er)", f:["je travaille","tu travailles","il travaille","nous travaillons","vous travaillez","ils travaillent"]},
+    {v:"étudier", c:"1 rad. (-er)", f:["j'étudie","tu étudies","il étudie","nous étudions","vous étudiez","ils étudient"]},
+    {v:"jouer", c:"1 rad. (-er)", f:["je joue","tu joues","il joue","nous jouons","vous jouez","ils jouent"]},
+    {v:"attendre", c:"1 rad. (-dre, sans -t)", f:["j'attends","tu attends","il attend","nous attendons","vous attendez","ils attendent"]},
+    {v:"descendre", c:"1 rad. (-dre, sans -t)", f:["je descends","tu descends","il descend","nous descendons","vous descendez","ils descendent"]},
+    {v:"offrir", c:"1 rad. (offrir-type, comme -er)", f:["j'offre","tu offres","il offre","nous offrons","vous offrez","ils offrent"]},
+    {v:"découvrir", c:"1 rad. (offrir-type, comme -er)", f:["je découvre","tu découvres","il découvre","nous découvrons","vous découvrez","ils découvrent"]},
+    {v:"dormir", c:"2 rad. (sing/plur)", f:["je dors","tu dors","il dort","nous dormons","vous dormez","ils dorment"]},
+    {v:"grossir", c:"2 rad. (-iss-, 2e groupe)", f:["je grossis","tu grossis","il grossit","nous grossissons","vous grossissez","ils grossissent"]},
+    {v:"lire", c:"2 rad. (sing/plur)", f:["je lis","tu lis","il lit","nous lisons","vous lisez","ils lisent"]},
+    {v:"écrire", c:"2 rad. (sing/plur)", f:["j'écris","tu écris","il écrit","nous écrivons","vous écrivez","ils écrivent"]},
+    {v:"mettre", c:"2 rad. (sing/plur)", f:["je mets","tu mets","il met","nous mettons","vous mettez","ils mettent"]},
+    {v:"guérir", c:"2 rad. (-iss-, 2e groupe)", f:["je guéris","tu guéris","il guérit","nous guérissons","vous guérissez","ils guérissent"]},
+    {v:"choisir", c:"2 rad. (-iss-, 2e groupe)", f:["je choisis","tu choisis","il choisit","nous choisissons","vous choisissez","ils choisissent"]},
+    {v:"vieillir", c:"2 rad. (-iss-, 2e groupe)", f:["je vieillis","tu vieillis","il vieillit","nous vieillissons","vous vieillissez","ils vieillissent"]},
+    {v:"salir", c:"2 rad. (-iss-, 2e groupe)", f:["je salis","tu salis","il salit","nous salissons","vous salissez","ils salissent"]},
+    {v:"rougir", c:"2 rad. (-iss-, 2e groupe)", f:["je rougis","tu rougis","il rougit","nous rougissons","vous rougissez","ils rougissent"]},
+    {v:"applaudir", c:"2 rad. (-iss-, 2e groupe)", f:["j'applaudis","tu applaudis","il applaudit","nous applaudissons","vous applaudissez","ils applaudissent"]},
+    {v:"réfléchir", c:"2 rad. (-iss-, 2e groupe)", f:["je réfléchis","tu réfléchis","il réfléchit","nous réfléchissons","vous réfléchissez","ils réfléchissent"]},
+    {v:"s'évanouir", c:"2 rad. (-iss-, pronominal)", f:["je m'évanouis","tu t'évanouis","il s'évanouit","nous nous évanouissons","vous vous évanouissez","ils s'évanouissent"]},
+    {v:"voir", c:"2 rad. (i↔y)", f:["je vois","tu vois","il voit","nous voyons","vous voyez","ils voient"]},
+    {v:"croire", c:"2 rad. (i↔y)", f:["je crois","tu crois","il croit","nous croyons","vous croyez","ils croient"]},
+    {v:"lever", c:"2 rad. (e↔è)", f:["je lève","tu lèves","il lève","nous levons","vous levez","ils lèvent"]},
+    {v:"acheter", c:"2 rad. (e↔è)", f:["j'achète","tu achètes","il achète","nous achetons","vous achetez","ils achètent"]},
+    {v:"préférer", c:"2 rad. (é↔è)", f:["je préfère","tu préfères","il préfère","nous préférons","vous préférez","ils préfèrent"]},
+    {v:"espérer", c:"2 rad. (é↔è)", f:["j'espère","tu espères","il espère","nous espérons","vous espérez","ils espèrent"]},
+    {v:"appeler", c:"2 rad. (consonne double)", f:["j'appelle","tu appelles","il appelle","nous appelons","vous appelez","ils appellent"]},
+    {v:"jeter", c:"2 rad. (consonne double)", f:["je jette","tu jettes","il jette","nous jetons","vous jetez","ils jettent"]},
+    {v:"envoyer", c:"2 rad. (-oyer, y→i)", f:["j'envoie","tu envoies","il envoie","nous envoyons","vous envoyez","ils envoient"]},
+    {v:"essuyer", c:"2 rad. (-uyer, y→i)", f:["j'essuie","tu essuies","il essuie","nous essuyons","vous essuyez","ils essuient"]},
+    {v:"payer", c:"2 rad. (-ayer, y→i optionnel)", f:[["je paie","je paye"],["tu paies","tu payes"],["il paie","il paye"],"nous payons","vous payez",["ils paient","ils payent"]]},
+    {v:"essayer", c:"2 rad. (-ayer, y→i optionnel)", f:[["j'essaie","j'essaye"],["tu essaies","tu essayes"],["il essaie","il essaye"],"nous essayons","vous essayez",["ils essaient","ils essayent"]]},
+    {v:"manger", c:"orthographique (g→ge)", f:["je mange","tu manges","il mange","nous mangeons","vous mangez","ils mangent"]},
+    {v:"commencer", c:"orthographique (c→ç)", f:["je commence","tu commences","il commence","nous commençons","vous commencez","ils commencent"]},
+    {v:"venir", c:"3 rad.", f:["je viens","tu viens","il vient","nous venons","vous venez","ils viennent"]},
+    {v:"prendre", c:"3 rad.", f:["je prends","tu prends","il prend","nous prenons","vous prenez","ils prennent"]},
+    {v:"devoir", c:"3 rad. (apparition v)", f:["je dois","tu dois","il doit","nous devons","vous devez","ils doivent"]},
+    {v:"boire", c:"3 rad. (apparition v)", f:["je bois","tu bois","il boit","nous buvons","vous buvez","ils boivent"]},
+  ];
+
+  const PRONOUNS = ["je","tu","il","nous","vous","ils"];
+
+  function buildDeck() {
+    const items = [];
+    for (const v of VERBS) {
+      for (let i = 0; i < 6; i++) {
+        const raw = v.f[i];
+        const accepted = Array.isArray(raw) ? raw : [raw];
+        items.push({
+          verb: v.v, cat: v.c, pron: PRONOUNS[i],
+          accepted: accepted, display: accepted[0]
+        });
+      }
+    }
+    return shuffle(items);
+  }
+
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function normalize(s) {
+    return s.toString().trim().toLowerCase()
+      .replace(/[‘’ʼ]/g, "'")
+      .replace(/\s+/g, ' ');
+  }
+
+  function getFrenchVoice() {
+    const voices = window.speechSynthesis.getVoices();
+    const fr = voices.filter(v => v.lang.startsWith('fr'));
+    const femaleNames = ['amélie','marie','hortense','audrey','florence','juliette','google français'];
+    const maleNames = ['thomas','nicolas','pierre'];
+    return (
+      fr.find(v => femaleNames.some(n => v.name.toLowerCase().includes(n))) ||
+      fr.find(v => !maleNames.some(n => v.name.toLowerCase().includes(n))) ||
+      fr[0] || null
+    );
+  }
+  let cachedVoice = null;
+  function speak(text, btn) {
+    if (!window.speechSynthesis) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'fr-FR';
+    if (!cachedVoice) cachedVoice = getFrenchVoice();
+    if (cachedVoice) u.voice = cachedVoice;
+    u.rate = 0.9;
+    if (btn) {
+      btn.classList.add('speaking');
+      u.onend = u.onerror = () => btn.classList.remove('speaking');
+    }
+    speechSynthesis.speak(u);
+  }
+  if (window.speechSynthesis) {
+    if (speechSynthesis.getVoices().length === 0) {
+      speechSynthesis.addEventListener('voiceschanged', () => { cachedVoice = getFrenchVoice(); }, { once: true });
+    } else {
+      cachedVoice = getFrenchVoice();
+    }
+  }
+
+  let deck = buildDeck();
+  let idx = 0, okCount = 0, koCount = 0;
+  let errors = [];
+  let answered = false;
+  let total = deck.length;
+
+  const $ = (id) => document.getElementById(id);
+  const $verb = $('verb'), $pron = $('pron'), $tag = $('cat-tag');
+  const $input = $('answer'), $check = $('check'), $reveal = $('reveal'), $next = $('next');
+  const $feedback = $('feedback');
+  const $progText = $('prog-text'), $progBar = $('prog-bar');
+  const $scoreOk = $('score-ok'), $scoreKo = $('score-ko');
+  const $restart = $('restart');
+  const $toggleTip = $('toggle-tip');
+  const $cardArea = $('card-area'), $endArea = $('end-area');
+
+  let tipHidden = (function(){
+    try { return localStorage.getItem('drill-tip-hidden') === '1'; } catch(e) { return false; }
+  })();
+  function applyTipState() {
+    if (tipHidden) {
+      $tag.classList.add('hidden');
+      $toggleTip.textContent = "Montrer l'indice";
+    } else {
+      $tag.classList.remove('hidden');
+      $toggleTip.textContent = "Cacher l'indice";
+    }
+  }
+  applyTipState();
+  $toggleTip.addEventListener('click', () => {
+    tipHidden = !tipHidden;
+    try { localStorage.setItem('drill-tip-hidden', tipHidden ? '1' : '0'); } catch(e) {}
+    applyTipState();
+  });
+
+  function renderItem() {
+    if (idx >= total) { renderEnd(); return; }
+    const it = deck[idx];
+    $verb.textContent = it.verb;
+    $pron.textContent = it.pron;
+    $tag.textContent = it.cat;
+    $input.value = '';
+    $input.className = 'answer';
+    $input.disabled = false;
+    $feedback.textContent = '';
+    $feedback.className = 'feedback';
+    $check.style.display = '';
+    $reveal.style.display = '';
+    $next.style.display = 'none';
+    answered = false;
+    updateBar();
+    setTimeout(() => $input.focus(), 30);
+  }
+
+  function updateBar() {
+    $progText.textContent = (Math.min(idx + 1, total)) + ' / ' + total;
+    $progBar.style.width = ((idx) / total * 100) + '%';
+    $scoreOk.textContent = '✓ ' + okCount;
+    $scoreKo.textContent = '✗ ' + koCount;
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function addSpeakToFeedback(text) {
+    const btn = document.createElement('button');
+    btn.className = 'speak-btn';
+    btn.type = 'button';
+    btn.textContent = '🔊';
+    btn.addEventListener('click', () => speak(text, btn));
+    $feedback.appendChild(document.createTextNode(' '));
+    $feedback.appendChild(btn);
+  }
+
+  function checkAnswer() {
+    if (answered) return;
+    const it = deck[idx];
+    const given = $input.value.trim();
+    if (!given) { $input.focus(); return; }
+    const norm = normalize(given);
+    const accepted = it.accepted.map(normalize);
+    const correct = accepted.includes(norm);
+    answered = true;
+    $input.disabled = true;
+    if (correct) {
+      okCount++;
+      $input.classList.add('ok');
+      $feedback.className = 'feedback ok';
+      $feedback.innerHTML = '✓ Correct !';
+      addSpeakToFeedback(it.display);
+    } else {
+      koCount++;
+      $input.classList.add('ko');
+      $feedback.className = 'feedback ko';
+      const showAnswer = it.accepted.length > 1 ? it.accepted.join(' / ') : it.display;
+      $feedback.innerHTML = '✗ Incorrect. Réponse : <span class="answer-text">' + escapeHtml(showAnswer) + '</span>';
+      addSpeakToFeedback(it.display);
+      errors.push({ verb: it.verb, pron: it.pron, given: given, correct: showAnswer });
+    }
+    $check.style.display = 'none';
+    $reveal.style.display = 'none';
+    $next.style.display = '';
+    updateBar();
+    setTimeout(() => $next.focus(), 30);
+  }
+
+  function reveal() {
+    if (answered) return;
+    const it = deck[idx];
+    const showAnswer = it.accepted.length > 1 ? it.accepted.join(' / ') : it.display;
+    $input.value = it.display;
+    $input.disabled = true;
+    $input.classList.add('ko');
+    $feedback.className = 'feedback ko';
+    $feedback.innerHTML = 'Réponse : <span class="answer-text">' + escapeHtml(showAnswer) + '</span>';
+    addSpeakToFeedback(it.display);
+    errors.push({ verb: it.verb, pron: it.pron, given: '(révélé)', correct: showAnswer });
+    koCount++;
+    answered = true;
+    $check.style.display = 'none';
+    $reveal.style.display = 'none';
+    $next.style.display = '';
+    updateBar();
+    setTimeout(() => $next.focus(), 30);
+  }
+
+  function nextItem() {
+    idx++;
+    renderItem();
+  }
+
+  function renderEnd() {
+    $cardArea.style.display = 'none';
+    $progBar.style.width = '100%';
+    $progText.textContent = total + ' / ' + total;
+    const pct = total ? Math.round((okCount / total) * 100) : 0;
+    let html = '<div class="end">';
+    html += '<h3>Terminé !</h3>';
+    html += '<p>Tu as fait les ' + total + ' conjugaisons.</p>';
+    html += '<div class="stats">';
+    html += '<div class="stat"><div class="label">Correct</div><div class="value ok">' + okCount + '</div></div>';
+    html += '<div class="stat"><div class="label">Erronés</div><div class="value ko">' + koCount + '</div></div>';
+    html += '<div class="stat"><div class="label">Score</div><div class="value">' + pct + '%</div></div>';
+    html += '</div>';
+    if (errors.length) {
+      html += '<p style="margin-top:1rem;font-weight:500;">À revoir (' + errors.length + ') :</p>';
+      html += '<div class="errors-list">';
+      for (const e of errors) {
+        html += '<div class="row"><span><b>' + escapeHtml(e.verb) + '</b> · ' + escapeHtml(e.pron) + '</span><span><span class="wrong">' + escapeHtml(e.given) + '</span> → <span class="right">' + escapeHtml(e.correct) + '</span></span></div>';
+      }
+      html += '</div>';
+    } else {
+      html += '<p style="color:var(--ok);font-weight:500;margin-top:1rem;">Sans-faute. Excellent !</p>';
+    }
+    html += '<div style="margin-top:1.25rem;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">';
+    html += '<button id="end-restart" type="button">Recommencer (mélanger à nouveau)</button>';
+    if (errors.length) html += '<button id="end-only-errors" type="button">Refaire seulement les erreurs (' + errors.length + ')</button>';
+    html += '</div></div>';
+    $endArea.innerHTML = html;
+    $endArea.style.display = '';
+    document.getElementById('end-restart').addEventListener('click', () => restart(false));
+    if (errors.length) {
+      document.getElementById('end-only-errors').addEventListener('click', () => restart(true));
+    }
+  }
+
+  function restart(onlyErrors) {
+    if (onlyErrors && errors.length) {
+      const errSet = new Set(errors.map(e => e.verb + '|' + e.pron));
+      const all = [];
+      for (const v of VERBS) {
+        for (let i = 0; i < 6; i++) {
+          const raw = v.f[i];
+          const accepted = Array.isArray(raw) ? raw : [raw];
+          if (errSet.has(v.v + '|' + PRONOUNS[i])) {
+            all.push({ verb: v.v, cat: v.c, pron: PRONOUNS[i], accepted: accepted, display: accepted[0] });
+          }
+        }
+      }
+      deck = shuffle(all);
+    } else {
+      deck = buildDeck();
+    }
+    total = deck.length;
+    idx = 0; okCount = 0; koCount = 0; errors = [];
+    $endArea.style.display = 'none';
+    $endArea.innerHTML = '';
+    $cardArea.style.display = '';
+    renderItem();
+  }
+
+  $check.addEventListener('click', checkAnswer);
+  $reveal.addEventListener('click', reveal);
+  $next.addEventListener('click', nextItem);
+  $restart.addEventListener('click', () => {
+    if (confirm('Recommencer ? Les progrès actuels seront perdus.')) restart(false);
+  });
+  $input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (!answered) checkAnswer();
+      else nextItem();
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && answered && document.activeElement !== $input) {
+      e.preventDefault();
+      nextItem();
+    }
+  });
+
+  renderItem();
+})();
+</script>
+</body>
+</html>
