@@ -6,12 +6,38 @@ Quiz interactivo de conjugación del **presente de indicativo** en francés. 282
 
 ## Características
 
-- Cubre las tres clasificaciones: verbos irregulares, verbos en `-er`, y verbos con otra terminación.
-- Cubre verbos con 1, 2 y 3 radicales, incluyendo casos especiales: `offrir`/`découvrir`, `attendre`/`descendre`, verbos del 2.º grupo (`-iss-`), cambios ortográficos (`manger`, `commencer`), cambios de acento (`lever`, `préférer`), doble consonante (`appeler`, `jeter`), `y → i` (`envoyer`, `essuyer`), variantes opcionales (`payer`, `essayer`), pronominales (`s'évanouir`), y verbos de 3 radicales (`venir`, `prendre`, `devoir`, `boire`).
+**Cobertura:**
+- Las tres clasificaciones: verbos irregulares, verbos en `-er`, y verbos con otra terminación.
+- Verbos con 1, 2 y 3 radicales, incluyendo casos especiales: `offrir`/`découvrir`, `attendre`/`descendre`, verbos del 2.º grupo (`-iss-`), cambios ortográficos (`manger`, `commencer`), cambios de acento (`lever`, `préférer`), doble consonante (`appeler`, `jeter`), `y → i` (`envoyer`, `essuyer`), variantes opcionales (`payer`, `essayer`), pronominales (`s'évanouir`), y verbos de 3 radicales (`venir`, `prendre`, `devoir`, `boire`).
 - Acepta variantes válidas (p.ej. `je paie` y `je paye`), apóstrofos rectos y curvos, y normaliza espacios.
+
+**Configuración previa al test:**
+- Slider para elegir el número de preguntas (1 a 282).
+- Cuatro modos de test:
+  - **Aléatoire** — orden puramente aleatorio, ignora la memoria.
+  - **Facile** ★ — repaso de las conjugaciones que ya dominas.
+  - **Moyen** ★★ — equilibrado, ligeramente sesgado hacia tus puntos débiles.
+  - **Difficile** ★★★ — focaliza las conjugaciones que más fallas (muestreo ponderado por una "puntuación de debilidad" que combina precisión histórica + las últimas 10 respuestas).
+
+**Memoria local persistente** (`localStorage`):
+- Por cada conjugación se guarda: número de intentos, aciertos, fecha del último intento, y las últimas 10 respuestas (para detectar rachas recientes).
+- Por cada sesión completada: fecha, número de preguntas, aciertos, modo.
+
+**Página "Statistiques":**
+- Tabla ordenada de peor a mejor con tus puntos débiles.
+- Filtro: sólo conjugaciones intentadas o las 282.
+- Barra de color por conjugación (verde → rojo) según rendimiento.
+- Botón para reiniciar la memoria.
+
+**Página "Progression":**
+- Resumen global: nº de sesiones, conjugaciones estudiadas, precisión global.
+- Gráfico SVG minimalista: precisión por sesión a lo largo de las últimas 20.
+- Última sesión con timestamp relativo.
+
+**Otras funcionalidades:**
 - Pronunciación con un click en cada respuesta (Web Speech API; voz femenina francesa preferida).
-- Modo "rehacer sólo los errores" al final.
-- Botón para esconder la pista de categoría (útil para auto-evaluación más estricta).
+- Modo "rehacer sólo los errores" al final del test.
+- Botón para esconder la pista de categoría (útil para auto-evaluación estricta).
 - Modo claro/oscuro automático según el sistema operativo.
 - Sin servidor, sin dependencias externas — funciona offline en cuanto se carga.
 
