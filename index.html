@@ -1066,6 +1066,13 @@
   }
 
   showScreen('practice');
+
+  // Debug: expose internals to the browser console
+  window._debug = {
+    VERBS, ALL_ITEMS, loadData, saveData, clearAllData,
+    getWeakness, selectItems, shuffle, normalize,
+    recordResult, recordSession, speak
+  };
 })();
 </script>
 </body>
